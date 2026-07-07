@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Chat</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+<div id="sidebar-backdrop"></div>
+<div id="app">
+  <aside id="sidebar">
+    <div class="sb-header">
+      <h1>Agent<span>Chat</span></h1>
+      <button id="newChatBtn" data-i18n="newChat">+ 新对话</button>
+      <button id="langBtn">CN/EN</button>
+    </div>
+    <div id="historyList"></div>
+    <div class="sb-footer">
+      <button class="sb-btn" id="openApiBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span data-i18n="apiKey">API 密钥</span>
+      </button>
+      <button class="sb-btn" id="openCustomBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span data-i18n="customModels">自定义模型</span>
+      </button>
+      <button class="sb-btn" id="openPersonaBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span data-i18n="personas">人物</span>
+      </button>
+      <button class="sb-btn" id="openSkillsBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        <span data-i18n="skills">技能</span>
+      </button>
+      <button class="sb-btn" id="openRagBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <span data-i18n="ragDocs">RAG 文档</span>
+      </button>
+      <button class="sb-btn" id="openMemoryBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+        <span data-i18n="saveMemory">保存记忆</span>
+      </button>
+      <button class="sb-btn theme-toggle" id="themeToggle" title="Toggle Dark Mode">
+        <span id="themeIcon">&#9790;</span>
+      </button>
+    </div>
+  </aside>
+
+  <main id="main">
+    <div id="chatHeader">
+      <select id="personaSelect" class="persona-select" title="Persona"></select>
+      <h2 id="sessionTitle">新对话</h2>
+      <div class="header-toggles">
+        <label class="toggle-label">
+          <input type="checkbox" id="ragToggle" checked>
+          <span class="toggle-text" data-i18n-label="rag">RAG</span>
+        </label>
+        <label class="toggle-label">
+          <input type="checkbox" id="thinkingToggle">
+          <span class="toggle-text" data-i18n-label="think">思考</span>
+        </label>
+      </div>
+    </div>
+    <div id="messages">
+      <div class="empty-state">
+        <div class="icon">&#128172;</div>
+        <p><span data-i18n="emptyTitle">选择一个对话或开始新对话</span><br><span data-i18n="emptySub">输入消息开始吧</span></p>
+      </div>
+    </div>
+    <div id="inputBar">
+      <div class="model-selector-wrapper">
+        <select id="modelSelect" class="model-select"></select>
+        <div id="modelInfo" class="model-info"></div>
+      </div>
+      <input id="messageInput" type="text" placeholder="输入消息..." autofocus>
+      <button id="sendBtn" data-i18n="send">发送</button>
+    </div>
+  </main>
+</div>
+
+<div class="modal-overlay" id="apiModal">
+  <div class="modal">
+    <h2 data-i18n="apiModalTitle">API 密钥</h2>
+    <p class="modal-hint" data-i18n="apiModalHint">为当前服务商输入 API 密钥</p>
+    <label data-i18n="apiKeyLabel">API 密钥</label>
+    <input type="password" id="apiKeyInput" placeholder="sk-...">
+    <div class="actions">
+      <button class="btn-primary" id="saveApiKeyBtn" data-i18n="save">保存</button>
+      <button class="btn-danger" id="deleteApiKeyBtn" data-i18n="del">删除</button>
+      <button class="btn-ghost" id="closeApiBtn" data-i18n="cancel">取消</button>
+    </div>
+    <div id="apiStatus"></div>
+    <div class="provider-links">
+      <p data-i18n="recommendProviders">推荐服务商：</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a href="https://platform.deepseek.com/api_keys" target="_blank">DeepSeek &#8599;</a>
+        <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI &#8599;</a>
+      </div>
+    </div>
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border-color)">
+      <button class="btn-danger" id="clearAllKeysBtn" style="width:100%" data-i18n="clearAllKeys">一键清除所有 API 密钥</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="ragModal">
+  <div class="modal">
+    <h2 data-i18n="docsTitle">RAG 文档</h2>
+    <label data-i18n="docsHint">上传文本文件</label>
+    <input type="file" id="ragFileInput" accept=".txt,.md,.json,.csv">
+    <div class="actions">
+      <button class="btn-primary" data-i18n="upload" id="uploadRagBtn">上传</button>
+      <button class="btn-ghost" data-i18n="close" id="closeRagBtn">关闭</button>
+    </div>
+    <div id="ragDocList"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="customModal">
+  <div class="modal">
+    <h2 id="customModalTitle" data-i18n="customTitle">自定义模型</h2>
+    <label data-i18n="customName">服务商标识</label>
+    <input type="text" id="customNameInput" placeholder="e.g. my-llm">
+    <label data-i18n="customDisplay">显示名称</label>
+    <input type="text" id="customDisplayInput" placeholder="e.g. My LLM">
+    <label data-i18n="customUrl">API 接口地址</label>
+    <input type="text" id="customUrlInput" placeholder="https://api.example.com/v1">
+    <label data-i18n="customModelsList">模型名称（逗号分隔）</label>
+    <input type="text" id="customModelsInput" placeholder="model-1, model-2">
+    <label data-i18n="customKey">API 密钥</label>
+    <input type="password" id="customKeyInput" placeholder="sk-...">
+    <div class="actions">
+      <button class="btn-primary" data-i18n="customSave" id="saveCustomBtn">保存</button>
+      <button class="btn-danger" id="deleteCustomBtn" style="display:none" data-i18n="customDelete">删除</button>
+      <button class="btn-ghost" data-i18n="customCancel" id="closeCustomBtn">取消</button>
+    </div>
+    <div id="customStatus"></div>
+    <div id="customList" style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border-color)"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="personaModal">
+  <div class="modal">
+    <h2 id="personaModalTitle" data-i18n="personaTitle">人物设定</h2>
+    <div id="personaForm">
+      <label data-i18n="personaName">人物名称</label>
+      <input type="text" id="personaNameInput" placeholder="e.g. Linux 运维专家">
+      <label data-i18n="personaPrompt">提示词（身份设定）</label>
+      <textarea id="personaPromptInput" placeholder="例如：你是一名资深的 Linux 运维工程师，精通服务器管理和故障排查。"></textarea>
+      <label data-i18n="personaSkillLabel">关联技能</label>
+      <div class="persona-skills-grid" id="personaSkillsGrid"></div>
+      <div class="actions">
+        <button class="btn-primary" id="savePersonaBtn" data-i18n="personaSave">保存</button>
+        <button class="btn-danger" id="deletePersonaBtn" style="display:none" data-i18n="personaDelete">删除</button>
+        <button class="btn-ghost" id="closePersonaFormBtn" data-i18n="personaCancel">取消</button>
+      </div>
+      <div id="personaStatus"></div>
+    </div>
+    <div id="personaList"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="skillsModal">
+  <div class="modal">
+    <h2 data-i18n="skillTitle">技能</h2>
+    <p class="modal-hint" data-i18n="skillDesc">开启后 AI 将能调用所选工具处理特定问题</p>
+    <div id="skillsList"></div>
+    <div class="actions" style="margin-top:16px">
+      <button class="btn-ghost" data-i18n="skillClose" id="closeSkillsBtn">关闭</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="memoryModal">
+  <div class="modal">
+    <h2 data-i18n="memoryTitle">保存对话记忆</h2>
+    <p class="modal-hint" data-i18n="memoryHint">选择要保存的对话，将其内容作为RAG知识库</p>
+    <div class="memory-session-list" id="memorySessionList"></div>
+    <div class="actions">
+      <button class="btn-primary" id="saveMemoryBtn" data-i18n="memorySave">保存选中对话</button>
+      <button class="btn-ghost" id="closeMemoryBtn" data-i18n="memoryCancel">取消</button>
+    </div>
+    <div id="memoryStatus"></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+const state = {
+  sessions: [], currentId: null, loading: false,
+  provider: 'openai', model: 'gpt-4o-mini', lang: 'zh',
+  skills: [], availableSkills: [], personas: [], currentPersonaId: '',
+  theme: localStorage.getItem('theme') || 'light'
+};
+
+const LANG = {
+  zh: {
+    newChat: '+ 新对话', noConversations: '暂无对话',
+    deleteConfirm: '确定删除此对话？',
+    deleteCustomConfirm: '确定删除此自定义模型？',
+    inputPlaceholder: '输入消息...', send: '发送', rag: 'RAG',
+    apiKey: 'API 密钥', ragDocs: 'RAG 文档',
+    emptyTitle: '选择一个对话或开始新对话', emptySub: '输入消息开始吧',
+    deleteKey: '确定删除 {p} 的 API 密钥？',
+    keyOk: '已配置 {p} API 密钥', keyNo: '未配置 {p} API 密钥',
+    apiModalTitle: 'API 密钥', apiModalHint: '为当前服务商输入 API 密钥',
+    apiKeyLabel: 'API 密钥', save: '保存', del: '删除', cancel: '取消',
+    close: '关闭', upload: '上传', noDocs: '暂无上传文档',
+    docsTitle: 'RAG 文档', docsHint: '上传文本文件',
+    error: '错误', modelSwitchFail: '切换模型失败',
+    noKey: '请先在设置中配置 API 密钥',
+    recommendProviders: '推荐服务商：', uploadFail: '上传失败',
+    sessionTitle: '新对话', histDel: '删除', chunks: '个片段',
+    langZh: '中/EN', langEn: 'CN/EN', modelLabel: '模型', think: '思考',
+    customModels: '自定义模型', customTitle: '自定义模型',
+    customName: '服务商标识', customDisplay: '显示名称',
+    customUrl: 'API 接口地址', customModelsList: '模型名称（逗号分隔）',
+    customKey: 'API 密钥', customSave: '保存', customDelete: '删除',
+    customCancel: '取消', customNoProviders: '暂无自定义模型',
+    customSaved: '保存成功', customFillRequired: '请填写必填项',
+    skills: '技能', skillTitle: '技能',
+    skillDesc: '开启后 AI 将能调用所选工具处理特定问题',
+    skillNoList: '暂无可用技能', skillClose: '关闭',
+    personas: '人物', personaTitle: '人物设定',
+    personaDefault: '默认', personaName: '人物名称',
+    personaPrompt: '提示词（身份设定）',
+    personaPromptHint: '例如：你是一名资深的 Linux 运维工程师，精通服务器管理和故障排查。',
+    personaSkillLabel: '关联技能',
+    personaSave: '保存', personaDelete: '删除', personaCancel: '取消',
+    personaNoList: '暂无创建的人物',
+    personaEdit: '编辑', personaNameReq: '请输入人物名称',
+    personaSaved: '保存成功', copied: '已复制',
+    saveMemory: '保存记忆', memoryTitle: '保存对话记忆',
+    memoryHint: '选择要保存的对话，将其内容作为RAG知识库',
+    memorySave: '保存选中对话', memoryCancel: '取消',
+    clearAllKeys: '一键清除所有 API 密钥',
+    clearAllKeysConfirm: '确定要清除所有 API 密钥吗？此操作不可撤销！',
+    clearAllKeysSuccess: '已成功清除 {p} 个 API 密钥',
+  },
+  en: {
+    newChat: '+ New Chat', noConversations: 'No conversations yet',
+    deleteConfirm: 'Delete this conversation?',
+    deleteCustomConfirm: 'Delete this custom provider?',
+    inputPlaceholder: 'Type a message...', send: 'Send', rag: 'RAG',
+    apiKey: 'API Key', ragDocs: 'RAG Documents',
+    emptyTitle: 'Select a chat or start a new one', emptySub: 'Type a message to begin',
+    deleteKey: 'Delete the saved API key for {p}?',
+    keyOk: 'API key configured for {p}', keyNo: 'No API key configured for {p}',
+    apiModalTitle: 'API Key', apiModalHint: 'Enter your API key for the selected provider',
+    apiKeyLabel: 'API Key', save: 'Save', del: 'Delete', cancel: 'Cancel',
+    close: 'Close', upload: 'Upload', noDocs: 'No documents uploaded',
+    docsTitle: 'RAG Documents', docsHint: 'Upload a text file',
+    error: 'Error', modelSwitchFail: 'Failed to switch model',
+    noKey: 'Please configure an API key first',
+    recommendProviders: 'Recommended providers:', uploadFail: 'Upload failed',
+    sessionTitle: 'New Chat', histDel: 'Delete', chunks: ' chunks',
+    langZh: '中/EN', langEn: 'CN/EN', modelLabel: 'Model', think: 'Think',
+    customModels: 'Custom Models', customTitle: 'Custom Model',
+    customName: 'Provider Name', customDisplay: 'Display Name',
+    customUrl: 'API Base URL', customModelsList: 'Model Names (comma separated)',
+    customKey: 'API Key', customSave: 'Save', customDelete: 'Delete',
+    customCancel: 'Cancel', customNoProviders: 'No custom providers',
+    customSaved: 'Saved', customFillRequired: 'Please fill required fields',
+    skills: 'Skills', skillTitle: 'Skills',
+    skillDesc: 'Enable skills to let AI use tools for specific tasks',
+    skillNoList: 'No skills available', skillClose: 'Close',
+    personas: 'Personas', personaTitle: 'Persona',
+    personaDefault: 'Default', personaName: 'Name',
+    personaPrompt: 'System Prompt',
+    personaPromptHint: 'e.g. You are a senior Linux engineer skilled in server management.',
+    personaSkillLabel: 'Linked Skills',
+    personaSave: 'Save', personaDelete: 'Delete', personaCancel: 'Cancel',
+    personaNoList: 'No personas yet',
+    personaEdit: 'Edit', personaNameReq: 'Please enter a name',
+    personaSaved: 'Saved', copied: 'Copied',
+    saveMemory: 'Save Memory', memoryTitle: 'Save Conversation Memory',
+    memoryHint: 'Select conversations to save as RAG knowledge base',
+    memorySave: 'Save Selected', memoryCancel: 'Cancel',
+    clearAllKeys: 'Clear All API Keys',
+    clearAllKeysConfirm: 'Are you sure you want to clear all API keys? This action cannot be undone!',
+    clearAllKeysSuccess: 'Successfully cleared {p} API keys',
+  }
+};
+
+function t(key, ...args) {
+  let s = (LANG[state.lang] || LANG.zh)[key] || key;
+  if (args.length) s = s.replace('{p}', args[0]);
+  return s;
+}
+
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+function toast(msg, type = 'info') {
+  const container = $('#toastContainer');
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  container.appendChild(el);
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(20px)';
+    el.style.transition = 'all 0.3s';
+    setTimeout(() => el.remove(), 300);
+  }, 3000);
+}
+
+async function api(url, opts = {}) {
+  const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...opts });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(err.detail || 'Request failed');
+  }
+  return res.json();
+}
+
+function escapeHtml(text) {
+  const d = document.createElement('div');
+  d.textContent = text;
+  return d.innerHTML;
+}
+
+function renderMarkdown(text) {
+  if (typeof marked !== 'undefined') {
+    return marked.parse(text, { breaks: true });
+  }
+  return text.replace(/\n/g, '<br>');
+}
+
+function formatTime(dateStr) {
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleTimeString(state.lang === 'zh' ? 'zh-CN' : 'en-US', { hour: '2-digit', minute: '2-digit' });
+  } catch { return ''; }
+}
+
+// --- Theme ---
+function applyTheme() {
+  document.body.setAttribute('data-theme', state.theme);
+  $('#themeIcon').textContent = state.theme === 'dark' ? '\u2600' : '\u263E';
+  localStorage.setItem('theme', state.theme);
+}
+
+function toggleTheme() {
+  state.theme = state.theme === 'dark' ? 'light' : 'dark';
+  applyTheme();
+}
+
+// --- Sessions ---
+async function loadSessions() {
+  state.sessions = await api('/api/sessions');
+  renderSessions();
+}
+
+function renderSessions() {
+  const el = $('#historyList');
+  if (!state.sessions.length) {
+    el.innerHTML = '<div class="hist-empty">' + t('noConversations') + '</div>';
+    return;
+  }
+  el.innerHTML = state.sessions.map(s => `
+    <div class="hist-item${s.id === state.currentId ? ' active' : ''}" data-id="${s.id}">
+      <div class="hist-row">
+        <span>${escapeHtml(s.title)}</span>
+        <button class="hist-del" data-id="${s.id}" title="${t('histDel')}">&#10005;</button>
+      </div>
+    </div>
+  `).join('');
+  el.querySelectorAll('.hist-item').forEach(item => {
+    item.addEventListener('click', e => {
+      if (e.target.closest('.hist-del')) return;
+      switchSession(item.dataset.id);
+    });
+  });
+  el.querySelectorAll('.hist-del').forEach(btn => {
+    btn.addEventListener('click', async e => {
+      e.stopPropagation();
+      if (!confirm(t('deleteConfirm'))) return;
+      await api('/api/sessions/' + btn.dataset.id, { method: 'DELETE' });
+      if (state.currentId === btn.dataset.id) {
+        state.currentId = null;
+        const s = state.sessions[0];
+        if (s) switchSession(s.id);
+        else { showEmptyState(); updateHeader(''); }
+      }
+      await loadSessions();
+    });
+  });
+}
+
+async function createSession() {
+  const s = await api('/api/sessions', { method: 'POST' });
+  state.sessions.unshift(s);
+  await switchSession(s.id);
+  renderSessions();
+}
+
+async function switchSession(id) {
+  state.currentId = id;
+  renderSessions();
+  const s = state.sessions.find(x => x.id === id);
+  updateHeader(s ? s.title : '');
+  const msgs = await api(`/api/sessions/${id}/messages`);
+  renderMessages(msgs);
+}
+
+function updateHeader(title) {
+  $('#sessionTitle').textContent = title || t('sessionTitle');
+}
+
+// --- Messages ---
+function renderMessages(msgs) {
+  const el = $('#messages');
+  if (!msgs || !msgs.length) {
+    showEmptyState();
+    return;
+  }
+  el.innerHTML = msgs.map(m => {
+    const time = m.created_at ? formatTime(m.created_at) : '';
+    const copyBtn = `<div class="msg-actions"><button class="msg-action-btn copy-btn" title="${t('copied')}">&#128203;</button></div>`;
+    if (m.role === 'assistant') {
+      return `<div class="msg assistant">${copyBtn}${renderMarkdown(m.content)}<div class="msg-time">${time}</div></div>`;
+    }
+    return `<div class="msg user">${copyBtn}<div style="white-space:pre-wrap">${escapeHtml(m.content)}</div><div class="msg-time">${time}</div></div>`;
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+  bindCopyButtons();
+}
+
+function bindCopyButtons() {
+  $$('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const msg = btn.closest('.msg');
+      const text = msg.textContent.replace(t('copied'), '').trim();
+      navigator.clipboard.writeText(text).then(() => {
+        toast(t('copied'), 'success');
+      });
+    });
+  });
+}
+
+function addMessage(role, content) {
+  const el = $('#messages');
+  const empty = el.querySelector('.empty-state');
+  if (empty) empty.remove();
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  const copyBtn = document.createElement('div');
+  copyBtn.className = 'msg-actions';
+  copyBtn.innerHTML = `<button class="msg-action-btn copy-btn" title="${t('copied')}">&#128203;</button>`;
+  div.appendChild(copyBtn);
+  if (role === 'assistant') {
+    div.innerHTML += renderMarkdown(content);
+  } else {
+    const contentDiv = document.createElement('div');
+    contentDiv.style.whiteSpace = 'pre-wrap';
+    contentDiv.textContent = content;
+    div.appendChild(contentDiv);
+  }
+  const timeDiv = document.createElement('div');
+  timeDiv.className = 'msg-time';
+  timeDiv.textContent = formatTime(new Date().toISOString());
+  div.appendChild(timeDiv);
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+  div.querySelector('.copy-btn')?.addEventListener('click', () => {
+    navigator.clipboard.writeText(content).then(() => toast(t('copied'), 'success'));
+  });
+}
+
+function showEmptyState() {
+  $('#messages').innerHTML = `
+    <div class="empty-state">
+      <div class="icon">&#128172;</div>
+      <p>${t('emptyTitle')}<br>${t('emptySub')}</p>
+    </div>`;
+}
+
+function addThinking(content) {
+  const el = $('#messages');
+  const btn = document.createElement('button');
+  btn.className = 'thought-toggle';
+  btn.textContent = state.lang === 'zh' ? '\u25B6 查看思考链' : '\u25B6 View reasoning';
+  btn.onclick = () => {
+    const block = btn.nextElementSibling;
+    if (block) {
+      block.classList.toggle('open');
+      btn.textContent = block.classList.contains('open')
+        ? (state.lang === 'zh' ? '\u25BC 收起思考链' : '\u25BC Hide reasoning')
+        : (state.lang === 'zh' ? '\u25B6 查看思考链' : '\u25B6 View reasoning');
+    }
+  };
+  const div = document.createElement('div');
+  div.className = 'thought';
+  div.textContent = content;
+  el.appendChild(btn);
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+
+function showLoading() {
+  const el = $('#messages');
+  const existing = el.querySelector('.loading-dots');
+  if (existing) return;
+  const div = document.createElement('div');
+  div.className = 'msg assistant';
+  const dots = document.createElement('div');
+  dots.className = 'loading-dots';
+  dots.innerHTML = '<span></span><span></span><span></span>';
+  div.appendChild(dots);
+  el.appendChild(div);
+  el.scrollTop = el.scrollHeight;
+}
+
+function hideLoading() {
+  const el = $('#messages');
+  const dots = el.querySelector('.loading-dots');
+  if (dots) dots.closest('.msg')?.remove();
+}
+
+// --- Chat ---
+async function sendMessage() {
+  const input = $('#messageInput');
+  const text = input.value.trim();
+  if (!text || state.loading) return;
+
+  if (!state.currentId) {
+    try {
+      const s = await api('/api/sessions', { method: 'POST' });
+      state.sessions.unshift(s);
+      state.currentId = s.id;
+      renderSessions();
+      updateHeader(s.title);
+    } catch (e) {
+      toast(t('error') + ': ' + e.message, 'error');
+      return;
+    }
+  }
+
+  input.value = '';
+  addMessage('user', text);
+  state.loading = true;
+  $('#sendBtn').disabled = true;
+  showLoading();
+
+  try {
+    const res = await api('/api/chat', {
+      method: 'POST',
+      body: JSON.stringify({
+        session_id: state.currentId,
+        message: text,
+        use_rag: $('#ragToggle').checked,
+        thinking_mode: $('#thinkingToggle').checked,
+        skills: state.skills,
+        persona_id: state.currentPersonaId
+      })
+    });
+    hideLoading();
+    if (res.reasoning) addThinking(res.reasoning);
+    addMessage('assistant', res.reply);
+
+    const s = state.sessions.find(x => x.id === state.currentId);
+    if (s && (s.title === 'New Chat' || s.title === '新对话')) {
+      s.title = text.length > 50 ? text.slice(0,50)+'...' : text;
+      updateHeader(s.title);
+      renderSessions();
+    }
+    await loadSessions();
+  } catch (e) {
+    hideLoading();
+    addMessage('system', t('error') + ': ' + e.message);
+  }
+  state.loading = false;
+  $('#sendBtn').disabled = false;
+  $('#messageInput').focus();
+}
+
+// --- Model Select ---
+const MODEL_DESCRIPTIONS = {
+  'deepseek-chat': 'DeepSeek Chat - 日常对话和任务',
+  'deepseek-reasoner': 'DeepSeek Reasoner - 深度推理和分析',
+  'deepseek-flash': 'DeepSeek Flash - 快速响应',
+  'deepseek-pro': 'DeepSeek Pro - 专业级推理',
+  'gpt-4o-mini': 'GPT-4o Mini - 轻量级多模态',
+  'gpt-4o': 'GPT-4o - 强大多模态',
+  'gpt-3.5-turbo': 'GPT-3.5 Turbo - 经济高效',
+};
+
+async function loadProviders() {
+  try {
+    const [providers, config] = await Promise.all([
+      api('/api/models'),
+      api('/api/active-model')
+    ]);
+    state.provider = config.provider;
+    state.model = config.model;
+    state.providers = providers;
+    const sel = $('#modelSelect');
+    sel.innerHTML = '';
+    
+    // 按优先级排序：DeepSeek 在前，然后是自定义模型，最后是其他
+    const sortedKeys = Object.keys(providers).sort((a, b) => {
+      if (a === 'deepseek') return -1;
+      if (b === 'deepseek') return 1;
+      if (a === 'openai') return -1;
+      if (b === 'openai') return 1;
+      if (a.startsWith('custom_')) return 1;
+      if (b.startsWith('custom_')) return -1;
+      return 0;
+    });
+    
+    for (const key of sortedKeys) {
+      const p = providers[key];
+      const group = document.createElement('optgroup');
+      group.label = p.name;
+      
+      p.models.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = key + ':' + m;
+        
+        // 显示模型名称和描述
+        const desc = MODEL_DESCRIPTIONS[m];
+        opt.textContent = desc ? `${m} - ${desc.split(' - ')[1]}` : m;
+        
+        // 标记当前选中的模型
+        if (key === config.provider && m === config.model) {
+          opt.selected = true;
+        }
+        
+        // 标记自定义模型
+        if (key.startsWith('custom_')) {
+          opt.textContent += ' [自定义]';
+        }
+        
+        group.appendChild(opt);
+      });
+      
+      sel.appendChild(group);
+    }
+    
+    // 显示当前模型信息
+    updateModelInfo(config.provider, config.model);
+  } catch (e) {
+    console.error('Failed to load providers:', e);
+  }
+}
+
+function updateModelInfo(provider, model) {
+  const infoEl = $('#modelInfo');
+  if (infoEl) {
+    const desc = MODEL_DESCRIPTIONS[model];
+    infoEl.textContent = desc || `${provider}/${model}`;
+    infoEl.classList.add('show');
+    setTimeout(() => infoEl.classList.remove('show'), 2000);
+  }
+}
+
+async function changeModel(value) {
+  const [provider, model] = value.split(':');
+  try {
+    await api('/api/active-model', {
+      method: 'POST',
+      body: JSON.stringify({ provider, model })
+    });
+    state.provider = provider;
+    state.model = model;
+    loadApiStatus(provider);
+  } catch (e) {
+    toast(t('modelSwitchFail') + ': ' + e.message, 'error');
+  }
+}
+
+// --- API Key ---
+function apiKeyProvider(p) {
+  return ['openai', 'deepseek'].includes(p) ? p : 'custom_' + p;
+}
+
+async function loadApiStatus(provider) {
+  try {
+    const p = apiKeyProvider(provider || state.provider);
+    const res = await api('/api/keys/' + encodeURIComponent(p));
+    const el = $('#apiStatus');
+    const displayP = p.startsWith('custom_') ? p.slice(7) : p;
+    if (res.configured) {
+      el.className = 'ok';
+      el.textContent = t('keyOk', displayP);
+      $('#apiKeyInput').value = '';
+    } else {
+      el.className = 'no';
+      el.textContent = t('keyNo', displayP);
+    }
+  } catch {}
+}
+
+async function saveApiKey() {
+  const input = $('#apiKeyInput');
+  const key = input.value.trim();
+  if (!key) return;
+  try {
+    await api('/api/keys/' + encodeURIComponent(apiKeyProvider(state.provider)), {
+      method: 'POST',
+      body: JSON.stringify({ key })
+    });
+    input.value = '';
+    await loadApiStatus(state.provider);
+    toast(t('keyOk', state.provider), 'success');
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+async function deleteApiKey() {
+  const displayP = state.provider;
+  if (!confirm(t('deleteKey', displayP))) return;
+  await api('/api/keys/' + encodeURIComponent(apiKeyProvider(state.provider)), { method: 'DELETE' });
+  await loadApiStatus(state.provider);
+}
+
+async function clearAllKeys() {
+  if (!confirm(t('clearAllKeysConfirm'))) return;
+  try {
+    const result = await api('/api/keys/clear-all', { method: 'POST' });
+    await loadApiStatus(state.provider);
+    toast(t('clearAllKeysSuccess', result.deleted), 'success');
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+// --- RAG ---
+async function loadDocuments() {
+  const docs = await api('/api/rag/documents');
+  const el = $('#ragDocList');
+  if (!docs.length) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--text-secondary);padding:12px 0">' + t('noDocs') + '</div>';
+    return;
+  }
+  el.innerHTML = docs.map(d => `
+    <div class="doc-item">
+      <div class="doc-info">
+        <div class="doc-title">${escapeHtml(d.title)}</div>
+        <div class="doc-meta">${d.chunks} ${t('chunks')} &middot; ${d.created_at}</div>
+      </div>
+      <button class="doc-del" data-id="${d.id}" title="${t('histDel')}">&times;</button>
+    </div>
+  `).join('');
+  el.querySelectorAll('.doc-del').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      await api('/api/rag/documents/' + btn.dataset.id, { method: 'DELETE' });
+      await loadDocuments();
+    });
+  });
+}
+
+async function uploadDocument() {
+  const input = $('#ragFileInput');
+  const file = input.files[0];
+  if (!file) return;
+  const form = new FormData();
+  form.append('file', file);
+  try {
+    const res = await fetch('/api/rag/upload', { method: 'POST', body: form });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.detail || t('uploadFail'));
+    }
+    input.value = '';
+    await loadDocuments();
+    toast(t('upload') + ' ' + file.name, 'success');
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+// --- Memory ---
+async function loadMemorySessions() {
+  try {
+    const sessions = await api('/api/sessions');
+    const el = $('#memorySessionList');
+    if (!sessions.length) {
+      el.innerHTML = '<div style="font-size:13px;color:var(--text-secondary);padding:12px 0">暂无对话记录</div>';
+      return;
+    }
+    
+    // 获取每个会话的最新消息作为预览
+    const sessionsWithPreview = await Promise.all(sessions.map(async (s) => {
+      try {
+        const messages = await api(`/api/sessions/${s.id}/messages`);
+        const lastMsg = messages.length > 0 ? messages[messages.length - 1] : null;
+        return {
+          ...s,
+          messageCount: messages.length,
+          preview: lastMsg ? lastMsg.content.substring(0, 100) + (lastMsg.content.length > 100 ? '...' : '') : '暂无消息'
+        };
+      } catch {
+        return {
+          ...s,
+          messageCount: 0,
+          preview: '暂无消息'
+        };
+      }
+    }));
+    
+    el.innerHTML = sessionsWithPreview.map(s => `
+      <div class="memory-session-item" data-id="${s.id}">
+        <input type="checkbox" id="memory-${s.id}" value="${s.id}">
+        <div class="session-info">
+          <div class="session-title">${escapeHtml(s.title)}</div>
+          <div class="session-meta">${s.messageCount} 条消息 &middot; ${s.updated_at || s.created_at}</div>
+          <div class="session-preview">${escapeHtml(s.preview)}</div>
+        </div>
+      </div>
+    `).join('');
+    
+    // 点击整个item切换checkbox
+    el.querySelectorAll('.memory-session-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        if (e.target.type === 'checkbox') return;
+        const checkbox = item.querySelector('input[type="checkbox"]');
+        checkbox.checked = !checkbox.checked;
+      });
+    });
+  } catch (e) {
+    console.error('Failed to load sessions for memory:', e);
+    toast('加载对话列表失败: ' + e.message, 'error');
+  }
+}
+
+async function saveMemory() {
+  const checkboxes = document.querySelectorAll('#memorySessionList input[type="checkbox"]:checked');
+  if (checkboxes.length === 0) {
+    toast('请至少选择一个对话', 'error');
+    return;
+  }
+  
+  const sessionIds = Array.from(checkboxes).map(cb => cb.value);
+  const statusEl = $('#memoryStatus');
+  statusEl.textContent = '正在保存...';
+  statusEl.style.color = 'var(--text-secondary)';
+  
+  try {
+    const result = await api('/api/memory/save', {
+      method: 'POST',
+      body: JSON.stringify({ session_ids: sessionIds })
+    });
+    
+    if (result.chunks === 0) {
+      statusEl.textContent = '选中的对话没有消息内容';
+      statusEl.style.color = 'var(--warning)';
+    } else {
+      statusEl.textContent = `保存成功！共 ${result.messages} 条消息，${result.chunks} 个片段已添加到知识库`;
+      statusEl.style.color = 'var(--success)';
+    }
+    
+    // 3秒后关闭模态框
+    setTimeout(() => {
+      $('#memoryModal').classList.remove('open');
+      statusEl.textContent = '';
+    }, 3000);
+  } catch (e) {
+    statusEl.textContent = '保存失败: ' + e.message;
+    statusEl.style.color = 'var(--danger)';
+  }
+}
+
+// --- Personas ---
+let editingPersonaId = null;
+
+async function loadPersonas() {
+  state.personas = await api('/api/personas');
+  renderPersonaList();
+  renderPersonaSelect();
+}
+
+function renderPersonaList() {
+  const el = $('#personaList');
+  if (!state.personas.length) {
+    el.innerHTML = '<div class="skill-empty">' + t('personaNoList') + '</div>';
+    return;
+  }
+  el.innerHTML = state.personas.map(p => {
+    const skillCount = p.skills ? p.skills.split(',').filter(s => s.trim()).length : 0;
+    return `<div class="doc-item">
+      <div class="doc-info" data-pid="${p.id}">
+        <div class="doc-title">${escapeHtml(p.name)}</div>
+        <div class="doc-meta">${skillCount ? skillCount + ' skill(s)' : ''}</div>
+      </div>
+      <button class="doc-del" data-pid="${p.id}" title="${t('personaDelete')}">&times;</button>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.doc-info').forEach(info => {
+    info.addEventListener('click', () => editPersona(info.dataset.pid));
+  });
+  el.querySelectorAll('.doc-del').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm(t('deleteCustomConfirm'))) return;
+      await api('/api/personas/' + btn.dataset.pid, { method: 'DELETE' });
+      if (state.currentPersonaId === btn.dataset.pid) {
+        state.currentPersonaId = '';
+        renderPersonaSelect();
+      }
+      await loadPersonas();
+    });
+  });
+}
+
+function renderPersonaSelect() {
+  const sel = $('#personaSelect');
+  const cur = state.currentPersonaId;
+  sel.innerHTML = `<option value="">${t('personaDefault')}</option>` +
+    state.personas.map(p => `<option value="${p.id}"${p.id === cur ? ' selected' : ''}>${escapeHtml(p.name)}</option>`).join('');
+}
+
+function renderPersonaSkillChips() {
+  const grid = $('#personaSkillsGrid');
+  if (!state.availableSkills.length) { grid.innerHTML = ''; return; }
+  const selected = ($('#personaSkillsInput')?.value || '').split(',').map(s => s.trim()).filter(Boolean);
+  grid.innerHTML = state.availableSkills.map(s =>
+    `<span class="persona-skill-chip${selected.includes(s.name) ? ' active' : ''}" data-skill="${s.name}">${escapeHtml(s.name)}</span>`
+  ).join('');
+  grid.querySelectorAll('.persona-skill-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      chip.classList.toggle('active');
+      const vals = [];
+      grid.querySelectorAll('.persona-skill-chip.active').forEach(c => vals.push(c.dataset.skill));
+      if (!$('#personaSkillsInput')) {
+        const hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.id = 'personaSkillsInput';
+        $('#personaForm').appendChild(hidden);
+      }
+      $('#personaSkillsInput').value = vals.join(',');
+    });
+  });
+}
+
+function resetPersonaForm() {
+  editingPersonaId = null;
+  $('#personaNameInput').value = '';
+  $('#personaPromptInput').value = '';
+  const hidden = $('#personaSkillsInput');
+  if (hidden) hidden.value = '';
+  $('#deletePersonaBtn').style.display = 'none';
+  $('#personaStatus').textContent = '';
+  $('#personaStatus').style.color = '';
+  renderPersonaSkillChips();
+  $('#personaModalTitle').textContent = t('personaTitle');
+}
+
+function editPersona(pid) {
+  const p = state.personas.find(x => x.id === pid);
+  if (!p) return;
+  editingPersonaId = pid;
+  $('#personaNameInput').value = p.name;
+  $('#personaPromptInput').value = p.prompt || '';
+  const hidden = $('#personaSkillsInput') || (() => { const h = document.createElement('input'); h.type = 'hidden'; h.id = 'personaSkillsInput'; $('#personaForm').appendChild(h); return h; })();
+  hidden.value = p.skills || '';
+  $('#deletePersonaBtn').style.display = '';
+  $('#personaStatus').textContent = '';
+  renderPersonaSkillChips();
+  $('#personaModalTitle').textContent = t('personaTitle') + ' - ' + p.name;
+}
+
+async function savePersona() {
+  const name = $('#personaNameInput').value.trim();
+  if (!name) { $('#personaStatus').textContent = t('personaNameReq'); $('#personaStatus').style.color = '#ef4444'; return; }
+  const prompt = $('#personaPromptInput').value.trim();
+  const skillsInput = $('#personaSkillsInput');
+  const skills = skillsInput ? skillsInput.value : '';
+  try {
+    if (editingPersonaId) {
+      await api('/api/personas/' + editingPersonaId, { method: 'PUT', body: JSON.stringify({ name, prompt, skills }) });
+    } else {
+      await api('/api/personas', { method: 'POST', body: JSON.stringify({ name, prompt, skills }) });
+    }
+    $('#personaStatus').textContent = t('personaSaved');
+    $('#personaStatus').style.color = '#22c55e';
+    resetPersonaForm();
+    await loadPersonas();
+  } catch (e) { $('#personaStatus').textContent = e.message; $('#personaStatus').style.color = '#ef4444'; }
+}
+
+async function deletePersona() {
+  if (!editingPersonaId) return;
+  if (!confirm(t('deleteCustomConfirm'))) return;
+  await api('/api/personas/' + editingPersonaId, { method: 'DELETE' });
+  if (state.currentPersonaId === editingPersonaId) { state.currentPersonaId = ''; renderPersonaSelect(); }
+  resetPersonaForm();
+  await loadPersonas();
+}
+
+// --- Skills ---
+async function loadSkills() {
+  try {
+    state.availableSkills = await api('/api/skills');
+    renderSkills();
+  } catch (e) {
+    console.error('Failed to load skills:', e);
+  }
+}
+
+function renderSkills() {
+  const el = $('#skillsList');
+  if (!state.availableSkills.length) {
+    el.innerHTML = '<div class="skill-empty">' + t('skillNoList') + '</div>';
+    return;
+  }
+  el.innerHTML = state.availableSkills.map(s => {
+    const isActive = state.skills.includes(s.name);
+    return `<div class="skill-item${isActive ? ' active' : ''}" data-name="${s.name}">
+      <div class="skill-toggle">${isActive ? '&#10003;' : ''}</div>
+      <div class="skill-info">
+        <div class="skill-name">${escapeHtml(s.name)}</div>
+        <div class="skill-desc">${escapeHtml(s.description)}</div>
+      </div>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.skill-item').forEach(item => {
+    item.addEventListener('click', () => toggleSkill(item.dataset.name));
+  });
+}
+
+function toggleSkill(name) {
+  const idx = state.skills.indexOf(name);
+  if (idx >= 0) state.skills.splice(idx, 1);
+  else state.skills.push(name);
+  renderSkills();
+}
+
+// --- Custom Providers ---
+let editingCustom = null;
+
+async function loadCustomList() {
+  const providers = await api('/api/custom-providers');
+  const el = $('#customList');
+  const keys = Object.keys(providers);
+  if (!keys.length) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--text-secondary);padding:8px 0">' + t('customNoProviders') + '</div>';
+    return;
+  }
+  el.innerHTML = keys.map(k => {
+    const p = providers[k];
+    return `<div class="doc-item">
+      <div class="doc-info" data-name="${k}" style="cursor:pointer">
+        <div class="doc-title">${escapeHtml(p.name)}</div>
+        <div class="doc-meta">${p.base_url}</div>
+      </div>
+      <button class="doc-del" data-name="${k}" title="${t('customDelete')}">&times;</button>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.doc-del').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm(t('deleteCustomConfirm'))) return;
+      // 移除 "custom_" 前缀（如果存在）
+      let name = btn.dataset.name;
+      if (name.startsWith('custom_')) {
+        name = name.substring(7);
+      }
+      await api('/api/custom-providers/' + encodeURIComponent(name), { method: 'DELETE' });
+      await loadCustomList();
+      await loadProviders();
+    });
+  });
+  el.querySelectorAll('.doc-item .doc-info').forEach(info => {
+    info.addEventListener('click', () => {
+      const name = info.dataset.name;
+      const p = providers[name];
+      editingCustom = name;
+      $('#customModalTitle').textContent = t('customTitle') + ' - ' + name;
+      $('#customNameInput').value = name;
+      $('#customNameInput').disabled = true;
+      $('#customDisplayInput').value = p.name;
+      $('#customUrlInput').value = p.base_url;
+      $('#customModelsInput').value = p.models.join(', ');
+      $('#deleteCustomBtn').style.display = '';
+      $('#customStatus').textContent = '';
+      $('#customKeyInput').value = '';
+      $('#customModal').classList.add('open');
+    });
+  });
+}
+
+async function saveCustomProvider() {
+  const name = $('#customNameInput').value.trim();
+  const display = $('#customDisplayInput').value.trim();
+  const url = $('#customUrlInput').value.trim();
+  const models = $('#customModelsInput').value.trim();
+  const key = $('#customKeyInput').value.trim();
+  if (!name || !url || !models) {
+    $('#customStatus').textContent = t('customFillRequired');
+    $('#customStatus').style.color = '#ef4444';
+    return;
+  }
+  try {
+    const method = editingCustom ? 'PUT' : 'POST';
+    const endpoint = editingCustom ? '/api/custom-providers/' + encodeURIComponent(editingCustom) : '/api/custom-providers';
+    await api(endpoint, {
+      method,
+      body: JSON.stringify({ name, display_name: display || name, base_url: url, models })
+    });
+    if (key) {
+      await api('/api/keys/custom_' + encodeURIComponent(name), {
+        method: 'POST',
+        body: JSON.stringify({ key })
+      });
+    }
+    $('#customKeyInput').value = '';
+    $('#customStatus').textContent = t('customSaved');
+    $('#customStatus').style.color = '#22c55e';
+    editingCustom = null;
+    $('#deleteCustomBtn').style.display = 'none';
+    $('#customNameInput').disabled = false;
+    await loadCustomList();
+    await loadProviders();
+  } catch (e) {
+    $('#customStatus').textContent = e.message;
+    $('#customStatus').style.color = '#ef4444';
+  }
+}
+
+async function deleteCustomProvider() {
+  let name = editingCustom || $('#customNameInput').value.trim();
+  if (!name || !confirm(t('deleteCustomConfirm'))) return;
+  
+  // 移除 "custom_" 前缀（如果存在）
+  if (name.startsWith('custom_')) {
+    name = name.substring(7);
+  }
+  
+  try {
+    await api('/api/custom-providers/' + encodeURIComponent(name), { method: 'DELETE' });
+    editingCustom = null;
+    $('#deleteCustomBtn').style.display = 'none';
+    $('#customNameInput').disabled = false;
+    $('#customNameInput').value = '';
+    $('#customDisplayInput').value = '';
+    $('#customUrlInput').value = '';
+    $('#customModelsInput').value = '';
+    $('#customKeyInput').value = '';
+    $('#customStatus').textContent = '';
+    await loadCustomList();
+    await loadProviders();
+  } catch (e) {
+    $('#customStatus').textContent = e.message;
+    $('#customStatus').style.color = '#ef4444';
+  }
+}
+
+// --- Language ---
+function toggleLang() {
+  state.lang = state.lang === 'zh' ? 'en' : 'zh';
+  applyLang();
+}
+
+function applyLang() {
+  const lang = LANG[state.lang] || LANG.zh;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (key in lang) el.textContent = lang[key];
+  });
+  document.querySelectorAll('[data-i18n-label]').forEach(el => {
+    const key = el.dataset.i18nLabel;
+    if (key in lang) el.textContent = lang[key];
+  });
+  $('#langBtn').textContent = t('lang' + (state.lang === 'zh' ? 'En' : 'Zh'));
+  if (!$('#sessionTitle').dataset.manual) {
+    $('#sessionTitle').textContent = t('sessionTitle');
+  }
+  $('#messageInput').placeholder = t('inputPlaceholder');
+  if (editingCustom) {
+    $('#customModalTitle').textContent = t('customTitle') + ' - ' + editingCustom;
+  }
+  renderSessions();
+  loadApiStatus(state.provider);
+}
+
+// --- Init ---
+async function init() {
+  applyTheme();
+  await loadProviders();
+  await loadSessions();
+  await loadApiStatus(state.provider);
+  await loadPersonas();
+  if (state.sessions.length > 0) {
+    await switchSession(state.sessions[0].id);
+  }
+
+  const closeModals = () => {
+    $$('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+  };
+  $$('.modal-overlay').forEach(m => {
+    m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); });
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeModals();
+  });
+  $$('.modal input').forEach(inp => {
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        const modal = inp.closest('.modal-overlay');
+        if (modal) {
+          const primary = modal.querySelector('.btn-primary');
+          if (primary) primary.click();
+        }
+      }
+    });
+  });
+
+  $('#newChatBtn').addEventListener('click', createSession);
+  $('#sendBtn').addEventListener('click', sendMessage);
+  $('#messageInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+  $('#modelSelect').addEventListener('change', e => changeModel(e.target.value));
+  $('#langBtn').addEventListener('click', toggleLang);
+  $('#themeToggle').addEventListener('click', toggleTheme);
+  $('#personaSelect').addEventListener('change', e => { state.currentPersonaId = e.target.value; });
+  $('#openPersonaBtn').addEventListener('click', async () => {
+    await loadPersonas();
+    if (!state.availableSkills.length) { try { state.availableSkills = await api('/api/skills'); } catch {} }
+    resetPersonaForm();
+    $('#personaModal').classList.add('open');
+  });
+  $('#closePersonaFormBtn').addEventListener('click', () => $('#personaModal').classList.remove('open'));
+  $('#savePersonaBtn').addEventListener('click', savePersona);
+  $('#deletePersonaBtn').addEventListener('click', deletePersona);
+  $('#openApiBtn').addEventListener('click', () => {
+    $('#apiModal').classList.add('open');
+    loadApiStatus(state.provider);
+  });
+  $('#closeApiBtn').addEventListener('click', closeModals);
+  $('#saveApiKeyBtn').addEventListener('click', saveApiKey);
+  $('#deleteApiKeyBtn').addEventListener('click', deleteApiKey);
+  $('#clearAllKeysBtn').addEventListener('click', clearAllKeys);
+  $('#openSkillsBtn').addEventListener('click', () => { $('#skillsModal').classList.add('open'); loadSkills(); });
+  $('#closeSkillsBtn').addEventListener('click', closeModals);
+  $('#openRagBtn').addEventListener('click', () => { $('#ragModal').classList.add('open'); loadDocuments(); });
+  $('#closeRagBtn').addEventListener('click', closeModals);
+  $('#uploadRagBtn').addEventListener('click', uploadDocument);
+  $('#openMemoryBtn').addEventListener('click', () => { $('#memoryModal').classList.add('open'); loadMemorySessions(); });
+  $('#closeMemoryBtn').addEventListener('click', closeModals);
+  $('#saveMemoryBtn').addEventListener('click', saveMemory);
+  $('#openCustomBtn').addEventListener('click', () => {
+    editingCustom = null;
+    $('#customModalTitle').textContent = t('customTitle');
+    $('#customNameInput').value = '';
+    $('#customNameInput').disabled = false;
+    $('#customDisplayInput').value = '';
+    $('#customUrlInput').value = '';
+    $('#customModelsInput').value = '';
+    $('#customKeyInput').value = '';
+    $('#deleteCustomBtn').style.display = 'none';
+    $('#customStatus').textContent = '';
+    $('#customModal').classList.add('open');
+    loadCustomList();
+  });
+  $('#closeCustomBtn').addEventListener('click', closeModals);
+  $('#saveCustomBtn').addEventListener('click', saveCustomProvider);
+  $('#deleteCustomBtn').addEventListener('click', deleteCustomProvider);
+
+  const backdrop = $('#sidebar-backdrop');
+  if (backdrop) {
+    backdrop.addEventListener('click', () => {
+      $('#sidebar').classList.remove('open');
+      backdrop.classList.remove('open');
+    });
+  }
+
+  applyLang();
+}
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
