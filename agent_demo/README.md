@@ -100,7 +100,7 @@ start.bat
 | `calculate_mortgage` | 房贷计算器 |
 | `bing_web_search` | 必应搜索  |
 | `search_weather` | 天气搜索  |
-| `calculate_mortgage` | 房贷计算器 |
+| `get_metal_prices` | 查询今日常见贵金属 |
 
 ## 项目结构
 
